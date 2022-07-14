@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { getUserInfo, handlelogin } from '@/api/user'
+import { getUserInfo, handlelogin, getDetailInfoById } from '@/api/user'
 // 状态
 // 初始化的时候从缓存中读取状态 并赋值到初始化的状态上
 // Vuex的持久化 如何实现 ？ Vuex和前端缓存相结合
@@ -38,8 +38,11 @@ const actions = {
   // 获取用户资料
   async getInfo ({ commit }) {
     const res = await getUserInfo()
-    console.log(res)
-    commit('updateUserInfo', res.data.data)
+    const detailInfo = await getDetailInfoById(res.userId)
+    const result = { ...res, ...detailInfo }
+    console.log(result)
+    commit('updateUserInfo', result)
+    return result
   }
 }
 
