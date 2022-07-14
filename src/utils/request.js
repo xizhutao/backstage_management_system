@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 const request = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 5000
+  timeout: 50000
 })
 // 请求拦截器为有权限的接口统一注入token
 request.interceptors.request.use((config) => {

@@ -64,8 +64,9 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout () {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      await this.$store.commit('user/removeToken') // 移除缓存
+      await this.$store.commit('user/deleteUserInfo')
+      this.$router.push(`/login`)
     }
   }
 }
