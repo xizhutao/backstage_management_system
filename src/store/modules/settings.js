@@ -1,5 +1,4 @@
 import defaultSettings from '@/settings'
-
 const { showSettings, fixedHeader, sidebarLogo } = defaultSettings
 
 const state = {
@@ -15,10 +14,11 @@ const mutations = {
       state[key] = value
     }
   }
+
 }
 
 const actions = {
-  changeSetting({ commit }, data) {
+  changeSetting ({ commit }, data) {
     commit('CHANGE_SETTING', data)
   }
 }

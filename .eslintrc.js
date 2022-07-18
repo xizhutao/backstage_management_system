@@ -197,6 +197,7 @@ module.exports = {
     'vue/html-self-closing': 0,
     'vue/html-indent': 0,
     'vue/html-closing-bracket-newline': 0,
-    'indent': 0
+    'indent': 0,
+    'vue/max-attributes-per-line': 0
   }
 }
