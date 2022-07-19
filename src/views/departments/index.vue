@@ -18,6 +18,7 @@
             @deletDepartment="getDepartmentList"
           />
         </el-tree>
+        <el-backtop></el-backtop>
       </el-card>
     </div>
   </div>

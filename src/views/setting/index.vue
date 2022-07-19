@@ -26,7 +26,12 @@
             <el-table-column prop="address" label="操作">
               <template slot-scope="scope"
                 ><el-button type="success" size="small">分配权限</el-button>
-                <el-button type="primary" size="small">编辑</el-button>
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click="editRole(scope.row.id)"
+                  >编辑</el-button
+                >
                 <el-button
                   type="danger"
                   size="small"
@@ -85,40 +90,42 @@
           </el-form>
         </el-tab-pane>
       </el-tabs>
-      <!-- 新增角色对话框 -->
+      <!-- 编辑弹层 -->
       <el-dialog
-        title="编辑角色"
+        title="编辑弹层"
         :visible.sync="dialogVisible"
-        width="30%"
-        @closed="handleClose"
+        @close="btnCancel"
       >
-        <!-- 表单区域 -->
+        <!--表单 -->
         <el-form
-          ref="ruleForm"
-          :model="ruleForm"
+          ref="roleForm"
+          :model="roleForm"
           :rules="rules"
-          label-width="100px"
-          class="demo-ruleForm"
+          label-width="120px"
         >
           <el-form-item label="角色名称" prop="name">
-            <el-input v-model="ruleForm.name"></el-input>
+            <el-input v-model="roleForm.name" />
           </el-form-item>
-          <el-form-item label="角色描述" prop="description">
-            <el-input v-model="ruleForm.description"></el-input>
+          <el-form-item label="角色描述">
+            <el-input v-model="roleForm.description" />
           </el-form-item>
         </el-form>
-        <!-- 底部按钮 -->
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="SubmitAdd">确 定</el-button>
-        </span>
+        <!-- 底部 -->
+        <el-row slot="footer" type="flex" justify="center">
+          <el-col :span="6">
+            <el-button size="small" @click="btnCancel">取消</el-button>
+            <el-button size="small" type="primary" @click="btnOK"
+              >确定</el-button
+            >
+          </el-col>
+        </el-row>
       </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { getRoleList, getCompanyInfo, deleteRole } from '@/api/settings'
+import { getRoleList, getCompanyInfo, deleteRole, getRoleDetail, updateRole, addRole } from '@/api/settings'
 import { mapGetters } from 'vuex'
 export default {
   filters: {},
@@ -139,18 +146,22 @@ export default {
         total: 0 // 记录总页数
       },
       RoleList: [], // 存放角色列表
-      dialogVisible: false, // 添加按钮的弹框
-      ruleForm: {
-        name: '',
-        description: ''
-      },
       rules: {
         name: [
           { required: true, message: '角色名不能为空', trigger: 'blur' },
           { validator: checkRoleNameRepeate, message: '角色名已经存在', trigger: 'blur' }
         ]
       },
-      formData: {} // 存放公司信息
+      formData: {}, // 存放公司信息
+      dialogVisible: false,
+      // 专门接收新增或者编辑的编辑的表单数据
+      roleForm: {
+        name: '',
+        description: ''
+      },
+      rules2: {
+        name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }]
+      }
 
     }
   },
@@ -176,19 +187,6 @@ export default {
       this.page.total = total
       this.RoleList = rows
     },
-    // 添加角色列表
-    addRole () {
-      this.dialogVisible = true
-    },
-    //  确认添加
-    async SubmitAdd () {
-      this.dialogVisible = false
-    },
-    // 关闭弹框之前清空表单
-    handleClose () {
-      // 将表单清空
-      this.$refs.ruleForm.resetFields()
-    },
     // 当前分页变化
     handleCurrentChange (newPage) {
       this.page.page = newPage
@@ -210,6 +208,45 @@ export default {
     // 获取的公司的信息
     async getCompanyInfo () {
       this.formData = await getCompanyInfo(this.companyId)
+    },
+    // 编辑角色
+    async editRole (id) {
+      this.roleForm = await getRoleDetail(id)
+      this.dialogVisible = true
+    },
+    // 确认编辑
+    async btnOK () {
+      try {
+        // await this.$refs.roleForm.validate()
+        // 校验通过了才会执行以下代码
+        if (this.roleForm.id) {
+          // 更新信息
+          await updateRole(this.roleForm)
+        } else {
+          // 新增
+          await addRole(this.roleForm)
+        }
+        this.dialogVisible = false
+        // 重新拉取角色列表
+        this.getRoleList()
+        this.$message.success('操作成功')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    // 取消编辑
+    btnCancel () {
+      // 将表单和校验规则清空
+      this.roleForm = {
+        name: '',
+        description: ''
+      }
+      this.$refs.roleForm.resetFields()
+      this.dialogVisible = false
+    },
+    // 添加角色
+    addRole () {
+      this.dialogVisible = true
     }
   }
 }

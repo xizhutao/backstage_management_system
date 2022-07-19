@@ -12,18 +12,6 @@ export const getRoleList = (params) => {
   })
 }
 /**
- *添加角色
- * @param {*} params
- * @returns
- */
-export const addRole = (data) => {
-  return request({
-    method: 'POST',
-    url: '/sys/role',
-    data
-  })
-}
-/**
  *删除角色
  * @param {*} params
  * @returns
@@ -42,4 +30,32 @@ export function getCompanyInfo (companyId) {
     url: `/company/${companyId}`
   })
 }
+/** *
+ * 修改角色
+ * ***/
+export function updateRole (data) {
+  return request({
+    url: `/sys/role/${data.id}`,
+    data,
+    method: 'put'
+  })
+}
+/**
+ * 获取角色详情
+ * **/
+export function getRoleDetail (id) {
+  return request({
+    url: `/sys/role/${id}`
+  })
+}
 
+/** *
+ * 新增角色
+ * ***/
+export function addRole (data) {
+  return request({
+    url: '/sys/role',
+    data,
+    method: 'post'
+  })
+}
