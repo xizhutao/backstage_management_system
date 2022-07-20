@@ -9,7 +9,9 @@
         <template v-slot:after>
           <el-button type="danger">普通excel导出</el-button>
           <el-button type="info">复杂excel导出</el-button>
-          <el-button type="success">excel导入</el-button>
+          <el-button type="success" @click="$router.push('/import')"
+            >excel导入</el-button
+          >
           <el-button type="primary" @click="addEmploy">新增员工</el-button>
         </template>
       </PageTools>
@@ -18,6 +20,16 @@
         <el-table-column type="index" label="序号" width="width" sortable>
         </el-table-column>
         <el-table-column label="姓名" prop="username" width="width" sortable>
+        </el-table-column>
+        <el-table-column label="头像" prop="staffPhoto" width="width" sortable>
+          <template slot-scope="scope">
+            <img
+              v-imageerror
+              :src="scope.row.staffPhoto"
+              style="width: 40px"
+              alt=""
+            />
+          </template>
         </el-table-column>
         <el-table-column label="手机号" prop="mobile" width="width" sortable>
         </el-table-column>
