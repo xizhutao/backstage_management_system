@@ -7,7 +7,9 @@
           <span>共{{ page.total }}条数据</span>
         </template>
         <template v-slot:after>
-          <el-button type="danger">普通excel导出</el-button>
+          <el-button type="danger" @click="exportExcel"
+            >普通excel导出</el-button
+          >
           <el-button type="info">复杂excel导出</el-button>
           <el-button type="success" @click="$router.push('/import')"
             >excel导入</el-button
@@ -76,7 +78,12 @@
         </el-table-column>
         <el-table-column label="操作" width="280" fixed="right" sortable>
           <template slot-scope="{ row }">
-            <el-button type="text" size="small">查看</el-button>
+            <el-button
+              type="text"
+              size="small"
+              @click="$router.push(`/employees/detail/${row.id}`)"
+              >查看</el-button
+            >
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
@@ -108,6 +115,7 @@
 import AddEmploy from './components/add-employ.vue'
 import emunEmployment from '@/api/constant/employees'
 import { getEmployeeList, delEmployee } from '@/api/employees'
+import { formatDate } from '@/filters'
 export default {
   filters: {},
   components: { AddEmploy },
@@ -158,6 +166,47 @@ export default {
     // 新增员工
     addEmploy () {
       this.showDialog = true
+    },
+    // excel导出
+    async exportExcel () {
+      const headers = {
+        '姓名': 'username',
+        '手机号': 'mobile',
+        '入职日期': 'timeOfEntry',
+        '聘用形式': 'formOfEmployment',
+        '转正日期': 'correctionTime',
+        '工号': 'workNumber',
+        '部门': 'departmentName'
+      }
+      // 对拿到的数据格式化
+      const formJson = (rows, headers) => {
+        return rows.map((item) => {
+          return Object.keys(headers).map((key) => {
+            if (headers[key] === 'timeOfEntry' || headers[key] === 'correctionTime') {
+              return formatDate(item[headers[key]])
+            } else if (headers[key] === 'formOfEmployment') {
+              const obj = emunEmployment.hireType.find(obj => obj.id === item[headers[key]])
+              return obj ? obj.value : '未知'
+            }
+            return item[headers[key]]
+          })
+        })
+      }
+      const multiHeader = [['姓名', '主要信息', '', '', '', '', '部门']]
+      const merges = ['A1:A2', 'B1:F1', 'G1:G2']
+      const { rows } = await getEmployeeList({ page: 1, size: this.page.total })
+      const data = formJson(rows, headers)
+      import('@/vendor/Export2Excel').then(excel => {
+        excel.export_json_to_excel({
+          header: Object.keys(headers), // 表头 必填
+          data, // 具体数据 必填
+          filename: '员工工资表', // 非必填
+          multiHeader,
+          merges
+          // autoWidth: true, // 非必填
+          // bookType: 'xlsx' // 非必填
+        })
+      })
     }
 
   }
