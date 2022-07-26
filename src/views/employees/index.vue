@@ -28,7 +28,13 @@
             <img
               v-imageerror
               :src="scope.row.staffPhoto"
-              style="width: 40px"
+              style="
+                width: 100px;
+                border-radius: 50%;
+                height: 100px;
+                padding: 10px;
+              "
+              @click="handleCode(scope.row.staffPhoto)"
               alt=""
             />
           </template>
@@ -87,7 +93,9 @@
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
-            <el-button type="text" size="small">角色</el-button>
+            <el-button type="text" size="small" @click="editRole(row.id)"
+              >角色</el-button
+            >
             <el-button type="text" size="small" @click="delEmployee(row.id)"
               >删除</el-button
             >
@@ -107,6 +115,17 @@
       </el-row>
       <!-- 弹层 -->
       <AddEmploy :show-dialog="showDialog"></AddEmploy>
+      <el-dialog title="二维码" :visible.sync="showCodeDialog">
+        <el-row type="flex" justify="center">
+          <canvas ref="myCanvas" />
+        </el-row>
+      </el-dialog>
+      <!-- 放置角色分配组件 -->
+      <AssignRole
+        ref="assignRole"
+        :showRoleDialog.sync="showRoleDialog"
+        :userId="userId"
+      />
     </div>
   </div>
 </template>
@@ -116,9 +135,11 @@ import AddEmploy from './components/add-employ.vue'
 import emunEmployment from '@/api/constant/employees'
 import { getEmployeeList, delEmployee } from '@/api/employees'
 import { formatDate } from '@/filters'
+import AssignRole from '@/views/employees/components/AssignRole'
+import QrCode from 'qrcode'
 export default {
   filters: {},
-  components: { AddEmploy },
+  components: { AddEmploy, AssignRole },
   data () {
     return {
       loading: false,
@@ -128,7 +149,10 @@ export default {
         size: 10,
         total: 0
       },
-      showDialog: false
+      showDialog: false,
+      showCodeDialog: false,
+      showRoleDialog: false,
+      userId: ''
     }
   },
   computed: {},
@@ -207,8 +231,24 @@ export default {
           // bookType: 'xlsx' // 非必填
         })
       })
-    }
-
+    },
+    // 点击头像生成二维码
+    handleCode (url) {
+      if (url) {
+        this.showCodeDialog = true
+        this.$nextTick(() => {
+          QrCode.toCanvas(this.$refs.myCanvas, url)
+        })
+      } else {
+        this.$message.warning('图片未上传')
+      }
+    },
+    // 编辑角色
+    async editRole (id) {
+      this.userId = id // props传值 是异步的
+      await this.$refs.assignRole.getDetailInfoById(id) // 父组件调用子组件方法
+      this.showRoleDialog = true
+    },
   }
 }
 </script>

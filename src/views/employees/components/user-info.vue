@@ -58,6 +58,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <image-upload ref="staffPhoto"></image-upload>
           </el-form-item>
         </el-col>
       </el-row>
@@ -91,6 +92,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <image-upload ref="myStaffPhoto"></image-upload>
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -387,6 +389,8 @@
 </template>
 
 <script>
+import { getPersonalDetail, updatePersonal, saveUserDetailById } from '@/api/employees'
+import { getDetailInfoById } from '@/api/user'
 import EmployeeEnum from '@/api/constant/employees'
 export default {
   data () {
@@ -456,6 +460,43 @@ export default {
         isThereAnyCompetitionRestriction: '', // 有无竞业限制
         proofOfDepartureOfFormerCompany: '', // 前公司离职证明
         remarks: '' // 备注
+      }
+    }
+  },
+  created () {
+    this.getPersonalDetail()
+    this.getUserDetailById()
+  },
+  methods: {
+    async getPersonalDetail () {
+      this.formData = await getPersonalDetail(this.userId) // 获取员工数据
+      if (this.formData.staffPhoto) {
+        this.$refs.myStaffPhoto.fileList = [{ url: this.formData.staffPhoto, upload: true }]
+      }
+    },
+    async savePersonal () {
+      const fileList = this.$refs.myStaffPhoto.fileList
+      if (fileList.some(item => !item.upload)) {
+        this.$message.warning('图片未上传完成')
+        return
+      }
+      await updatePersonal({ ...this.formData, staffPhoto: fileList.length ? fileList[0].url : ' ' })
+      this.$message.success('保存成功')
+    },
+    async saveUser () {
+      const fileList = this.$refs.staffPhoto.fileList
+      if (fileList.some(item => !item.upload)) {
+        this.$message.warning('图片未上传完成')
+        return
+      }
+      //  调用父组件
+      await saveUserDetailById({ ...this.userInfo, staffPhoto: fileList.length ? fileList[0].url : ' ' })
+      this.$message.success('保存成功')
+    },
+    async getUserDetailById () {
+      this.userInfo = await getDetailInfoById(this.userId)
+      if (this.userInfo.staffPhoto && this.userInfo.staffPhoto.trim()) {
+        this.$refs.staffPhoto.fileList = [{ url: this.userInfo.staffPhoto, upload: true }]
       }
     }
   }
