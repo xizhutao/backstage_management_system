@@ -24,18 +24,20 @@
             </el-table-column>
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
-              <template slot-scope="scope"
-                ><el-button type="success" size="small">分配权限</el-button>
-                <el-button
-                  type="primary"
+              <template slot-scope="{ row }"
+                ><el-button
+                  type="success"
                   size="small"
-                  @click="editRole(scope.row.id)"
+                  @click="distributePermission(row.id)"
+                  >分配权限</el-button
+                >
+                <el-button type="primary" size="small" @click="editRole(row.id)"
                   >编辑</el-button
                 >
                 <el-button
                   type="danger"
                   size="small"
-                  @click="deleteRole(scope.row.id)"
+                  @click="deleteRole(row.id)"
                   >删除</el-button
                 ></template
               >
@@ -120,14 +122,40 @@
           </el-col>
         </el-row>
       </el-dialog>
+      <!-- 分配权限弹层 -->
+      <el-dialog :visible.sync="dialogPermVisible">
+        <el-tree
+          :data="permData"
+          :default-expand-all="true"
+          :props="defaultProps"
+          :show-checkbox="true"
+          :check-strictly="true"
+          :default-checked-keys="permIds"
+          node-key="id"
+          ref="treeNode"
+        >
+        </el-tree>
+        <el-row slot="footer" type="flex" justify="center">
+          <el-col :span="6">
+            <el-button type="primary" size="small" @click="assignPermis"
+              >确定</el-button
+            >
+            <el-button size="small">取消</el-button>
+          </el-col>
+        </el-row>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { getRoleList, getCompanyInfo, deleteRole, getRoleDetail, updateRole, addRole } from '@/api/settings'
+import { getRoleList, getCompanyInfo, deleteRole, getRoleDetail, updateRole, addRole, assignPerm } from '@/api/settings'
+import { getPermissionList } from '@/api/permission'
+import { tranListToTreeData } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
+  name: 'Setting'
+  ,
   filters: {},
   components: {},
   data () {
@@ -154,6 +182,7 @@ export default {
       },
       formData: {}, // 存放公司信息
       dialogVisible: false,
+      dialogPermVisible: false,
       // 专门接收新增或者编辑的编辑的表单数据
       roleForm: {
         name: '',
@@ -161,8 +190,15 @@ export default {
       },
       rules2: {
         name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }]
-      }
-
+      },
+      permData: [], //存放权限列表
+      defaultProps: {
+        label: 'name',
+        children: 'children'
+      },
+      roleId: null, //用来记录角色id
+      checkedNodeArr: [],
+      permIds: [] //用来存放权限id
     }
   },
   computed: {
@@ -247,6 +283,22 @@ export default {
     // 添加角色
     addRole () {
       this.dialogVisible = true
+    },
+    // 分配权限
+    async distributePermission (id) {
+      this.roleId = id
+      const { permIds } = await getRoleDetail(id)
+      this.permIds = permIds
+      const res = await getPermissionList()
+      this.permData = tranListToTreeData(res, '0')
+      this.dialogPermVisible = true
+    },
+    // 确定分配权限
+    async assignPermis () {
+      this.permIds = this.$refs.treeNode.getCheckedKeys()
+      // 更新角色权限
+      await assignPerm({ permIds: this.permIds, id: this.roleId })
+      this.dialogPermVisible = false //关闭弹层
     }
   }
 }
