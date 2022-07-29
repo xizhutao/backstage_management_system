@@ -42,7 +42,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Hamburger from '@/components/Hamburger'
-
+import { resetRouter } from '@/router/index'
 export default {
   components: {
     Hamburger
@@ -66,6 +66,8 @@ export default {
     async logout () {
       await this.$store.commit('user/removeToken') // 移除缓存
       await this.$store.commit('user/deleteUserInfo')
+      resetRouter() //重置路由
+      this.$store.commit('permission/setRoutes', [])
       this.$router.push(`/login`)
     }
   }

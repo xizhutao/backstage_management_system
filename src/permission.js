@@ -14,7 +14,11 @@ router.beforeEach(async (to, from, next) => {
     } else {
       // 如果用户不存在就就分发获取用户信息的action
       if (!store.getters.userId) {
-        await store.dispatch('user/getInfo')
+        const { roles } = await store.dispatch('user/getInfo')
+        // 分发筛选用户权限的action
+        const filterRoutes = await store.dispatch('permission/filterRoutes', roles.menus)
+        router.addRoutes([...filterRoutes, { path: '*', redirect: '/404', hidden: true }])
+        next(to.path) //addRouter必须配合此代码使用
       }
       next()
     }

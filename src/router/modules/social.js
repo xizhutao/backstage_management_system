@@ -1,7 +1,7 @@
 import Layout from '@/layout'
 
 export default {
-  path: '/social',
+  path: '/social_securitys',
   name: 'social',
   component: Layout,
   children: [{
