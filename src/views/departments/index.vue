@@ -25,7 +25,7 @@
 </template>
 <script>
 import TreeTools from '@/views/departments/components/TreeTools'
-import { getDepartments } from '@/api/department'
+import { getDepartments } from '@/api/departments'
 import { tranListToTreeData } from '@/utils/index'
 export default {
   filters: {},

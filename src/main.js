@@ -12,12 +12,17 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
-
+import checkPermission from '@/mixins/checkPermission'
 import '@/icons' // icon
 import '@/permission' // permission control //权限控制
 import * as directives from '@/directives'
 import * as filters from '@/filters'
 import Component from '@/components'
+Vue.mixin(checkPermission) // 注册全局的混入
+Vue.filter('getDay', (value) => {
+  const day = value.split('-')[2]
+  return day.startsWith('0') ? day.substr(1) : day
+})
 Vue.use(Component) // 注册自己的插件
 Object.keys(directives).forEach(item => {
   Vue.directive(item, directives[item])

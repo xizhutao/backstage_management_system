@@ -136,7 +136,7 @@
 
 <script>
 // 该组件需要对外开放属性 外部需要提供一个对象 对象里需要有name  manager
-import { delDepartment, addDepartment, getDepartments, editDepartment, editDepartmentDetail } from '@/api/department'
+import { delDepartment, addDepartment, getDepartments, editDepartment, editDepartmentDetail } from '@/api/departments'
 import { getSimpleUserList } from '@/api/user'
 export default {
   name: 'TreeTools',

@@ -88,7 +88,7 @@
 
 <script>
 import EmployeeEnum from '@/api/constant/employees'
-import { getDepartments } from '@/api/department'
+import { getDepartments } from '@/api/departments'
 import { addEmployee } from '@/api/employees'
 import { tranListToTreeData } from '@/utils'
 export default {
