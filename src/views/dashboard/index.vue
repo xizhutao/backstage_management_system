@@ -85,7 +85,7 @@
             <span>流程申请</span>
           </div>
           <div class="sideNav">
-            <el-button class="sideBtn">加班离职</el-button>
+            <el-button class="sideBtn" @click="dimission">加班离职</el-button>
             <el-button class="sideBtn">请假调休</el-button>
             <el-button class="sideBtn">审批列表</el-button>
             <el-button class="sideBtn">我的信息</el-button>
@@ -130,6 +130,39 @@
         </el-card>
       </el-col>
     </el-row>
+    <!-- 离职弹层 -->
+    <el-dialog title="离职申请" :visible.sync="dialogVisible" width="width">
+      <!-- 表单 -->
+      <el-form ref="form" :rules="rules" :model="form" label-width="120px">
+        <!-- 离职时间 -->
+        <el-form-item label="离职时间" prop="dataValue">
+          <el-date-picker
+            v-model="form.dataValue"
+            type="datetime"
+            placeholder="选择日期时间"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <!-- 离职原因 -->
+        <el-form-item label="离职原因" label-width="120px" prop="reason">
+          <el-input
+            type="textarea"
+            :rows="3"
+            placeholder="请输入内容"
+            v-model="form.reason"
+            style="width: 70%"
+          >
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-row type="flex" justify="center">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="btnOk">确 定</el-button>
+        </el-row>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -152,7 +185,27 @@ export default {
   },
   data () {
     return {
-      errorImage: require('@/assets/common/bigUserHeader.png')
+      errorImage: require('@/assets/common/bigUserHeader.png'),
+      dialogVisible: false,
+      form: {
+        dataValue: '',
+        reason: '',
+        processKey: 'process_dimission',
+        processName: '离职'
+      },
+      rules: {
+        dataValue: [{ required: true, message: '请输入日期时间', trigger: 'blur' }],
+        reason: [{ required: true, message: '请输入离职原因', trigger: 'blur' }]
+      }
+    }
+  },
+  methods: {
+    dimission () {
+      this.dialogVisible = true
+    },
+    // 确认提交按钮
+    btnOk () {
+      this.dialogVisible = false
     }
   }
 }

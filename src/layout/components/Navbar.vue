@@ -13,6 +13,12 @@
     <!-- <breadcrumb class="breadcrumb-container" /> -->
 
     <div class="right-menu">
+      <!-- 放置全局插件按 -->
+      <!-- <LangeChange>123</LangeChange> -->
+      <!-- 多语言插件 -->
+      <Lang />
+      <!-- 全屏插件 -->
+      <ScreenFull>123</ScreenFull>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img
@@ -100,6 +106,7 @@ export default {
   }
 
   .right-menu {
+    display: flex;
     float: right;
     height: 100%;
     line-height: 50px;
@@ -128,7 +135,7 @@ export default {
 
     .avatar-container {
       margin-right: 30px;
-
+      margin-left: 10px;
       .avatar-wrapper {
         margin-top: 5px;
         position: relative;
